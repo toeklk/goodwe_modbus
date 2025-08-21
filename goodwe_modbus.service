@@ -1,6 +1,7 @@
 [Unit]
 Description=GoodWe Modbus Bridge
 After=network.target
+Before=evcc.service
 StartLimitIntervalSec=0
 
 [Service]
