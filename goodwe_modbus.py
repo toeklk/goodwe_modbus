@@ -5,7 +5,7 @@ import time
 import concurrent.futures
 import goodwe
 
-from pymodbus.datastore import ModbusBaseSlaveContext
+from pymodbus.datastore import ModbusBaseDeviceContext
 from pymodbus.datastore import ModbusServerContext
 from pymodbus.server import StartAsyncTcpServer
 
@@ -22,7 +22,7 @@ class Entry:
         self.size = anz
         self.factor = f
 
-class GoodweContext(ModbusBaseSlaveContext):
+class GoodweContext(ModbusBaseDeviceContext):
     """ the modbus api handler """
 
     map : tuple[Entry, ...] = (
@@ -65,13 +65,12 @@ class GoodweContext(ModbusBaseSlaveContext):
         log.error(f"offset {address} not found in mapping")
         raise ValueError()
 
-
     def reset(self):
         logging.debug("reset")
 
     def decode(self, fx):
          #print(f"decode {fx}")
-         ModbusBaseSlaveContext.decode(self,fx)
+         ModbusBaseDeviceContext.decode(self,fx)
 
     def validate(self, fx, address, count=1):
          logging.debug(f"validate {fx} {address} {count}")
@@ -79,8 +78,8 @@ class GoodweContext(ModbusBaseSlaveContext):
          #print(entry.id_)
          return True
 
-    def getValues(self, fx, address, count=1):
-         logging.debug(f"getValues {fx} {address} {count}")
+    def getValues(self, func_code, address, count=1):
+         logging.debug(f"getValues {func_code} {address} {count}")
          entry = self.findSensor(address)
          #print(entry.id_)
          # avoid a round trip to goodwe for every single value
@@ -111,15 +110,15 @@ class GoodweContext(ModbusBaseSlaveContext):
                 return [0]
             return [0, 0]
 
-    def setValues(self, fx, address, values):
-         logging.debug(f"setValues {fx} {address} {values}")
+    def setValues(self, func_code, address, values):
+         logging.debug(f"setValues {func_code} {address} {values}")
 
 async def run_server(ip_address):
     store = GoodweContext()
     await store.addInverter(ip_address)
     #store.findSensor(36025)
     #store.getValues(3, 36025,2)
-    context = ModbusServerContext(slaves=store, single=True)
+    context = ModbusServerContext(devices=store, single=True)
     await StartAsyncTcpServer(context=context, address=("localhost", 8899))
 
 if __name__ == "__main__":
