@@ -1,3 +1,6 @@
+# project ended
+evcc now supports direct connection to ET Hybrid Inverters via the WIFI access. So the converter is no more needed.
+
 # goodwe_modbus
 Bridge for GoodWe ET/DT between EVCC modbus protocol and GoodWe WiFi access procotol 
 If you have the new WIFI/Lan Dongle you dont need this for ET Hybrid Inverters, but for DT Inverters with the recent Firmware and WIFI/Lan Dongle this works.
